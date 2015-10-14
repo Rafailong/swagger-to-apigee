@@ -1,6 +1,9 @@
 # Logs
 logs
 *.log
+config.js
+data/
+test.json
 
 # Runtime data
 pids
