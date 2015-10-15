@@ -1,4 +1,4 @@
-<Flow name="{{{flowName}}}">
+<Flow name="{{{summary}}}">
   <Description>{{notes}}</Description>
   <Request/>
   <Response/>
