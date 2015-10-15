@@ -21,4 +21,5 @@ module.exports = function (grunt) {
  require('load-grunt-tasks')(grunt);
  grunt.loadTasks('tasks');
  grunt.registerTask('default', ['availabletasks']);
+ grunt.registerTask('do', ['readAPI', 'exportApigeeProxies']);
 };

@@ -1,0 +1,6 @@
+<Flow name="comprobantes">
+  <Description>{{summary}}</Description>
+  <Request/>
+  <Response/>
+  <Condition>(request.verb = "{{method}}") and (proxy.pathsuffix ~~ "{{{path}}}")</Condition>
+</Flow>
