@@ -38,7 +38,7 @@ module.exports = function (grunt) {
       .pipe(es.parse())
       .pipe(es.map(parseResource))
       .pipe(es.map(formXMLText))
-      // .pipe(es.map(saveResourceFlowsToFile))
+      .pipe(es.map(saveResourceFlowsToFile))
       .on('error', function(err){
         grunt.log.error('Error while reading file.');
         grunt.log.error(err);
@@ -67,20 +67,26 @@ module.exports = function (grunt) {
       return callback(null, Mustache.render(apigeeFlowTemplate, op));
     }, function (err, result) {
       if (err) return callback(err);
-      var transformed = {
-        path: path.path,
-        ops: result
-      };
+      var transformed = { path: path.path, ops: result };
       callback(null, transformed);
     });
   }
 
   function formXMLText(resource, callback) {
-    console.log(resource);
-    callback(null);
+    grunt.log.writeln('forming text for ' + resource[0].path);
+    var text = '';
+    resource[0].ops.forEach(function (element, index, array) {
+      text += element;
+    });
+    callback(null, { path: resource[0].path, text: text });
   }
 
-  // function saveResourceFlowsToFile(flows, callback) {
-  //   fs.writeFile()
-  // }
+  function saveResourceFlowsToFile(flows, callback) {
+    var fileName = flows.path.replace(/\//g, '-');
+    grunt.log.writeln('saving flow for: ' + fileName);
+    fs.writeFile(path.join(flowsPath, fileName), flows.text, 'utf8', function (err) {
+      if (err) return callback(err);
+      callback(null);
+    });
+  }
 };
