@@ -1,5 +1,6 @@
 
 var fs = require('fs');
+var os = require('os');
 var util = require('util');
 var path = require('path');
 var async = require('async');
@@ -32,8 +33,7 @@ module.exports = function (grunt) {
   });
 
   function doProcess(done) {
-    var lineNumber = 1;
-    var readStream = fs.createReadStream(sourceURI)
+    fs.createReadStream(sourceURI)
       .pipe(es.split())
       .pipe(es.parse())
       .pipe(es.map(parseResource))
@@ -78,15 +78,24 @@ module.exports = function (grunt) {
     resource[0].ops.forEach(function (element, index, array) {
       text += element;
     });
-    callback(null, { path: resource[0].path, text: text });
+    var flowName = parseFlowName(resource[0].path);
+    callback(null, { path: flowName, text: text });
   }
 
   function saveResourceFlowsToFile(flows, callback) {
-    var fileName = flows.path.replace(/\//g, '-');
-    grunt.log.writeln('saving flow for: ' + fileName);
-    fs.writeFile(path.join(flowsPath, fileName), flows.text, 'utf8', function (err) {
+    grunt.log.writeln('saving flow for: ' + flows.path + '.xml');
+    var text = '<?xml version="1.0" encoding="UTF-8"?>' + os.EOL + flows.text;
+    var filePath = path.join(flowsPath, flows.path + '.xml');
+    grunt.file.write(filePath);
+    fs.writeFile(filePath, flows.text, 'utf8', function (err) {
       if (err) return callback(err);
       callback(null);
     });
+  }
+
+  function parseFlowName(path) {
+    var fileName = path.replace(/\//, ''); // replace the first slach by empty string
+    fileName = fileName.replace(/\//g, '-'); // replace the intermadiate slasheh by a dash
+    return fileName;
   }
 };
