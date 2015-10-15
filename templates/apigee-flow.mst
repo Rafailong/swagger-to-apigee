@@ -1,5 +1,5 @@
-<Flow name="comprobantes">
-  <Description>{{summary}}</Description>
+<Flow name="{{{flowName}}}">
+  <Description>{{notes}}</Description>
   <Request/>
   <Response/>
   <Condition>(request.verb = "{{method}}") and (proxy.pathsuffix ~~ "{{{path}}}")</Condition>
