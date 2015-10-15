@@ -16,6 +16,11 @@ module.exports = function (grunt) {
   var apigeeFlowTemplateURI = path.join(__dirname, '../', 'templates', 'apigee-flow.mst');
   var apigeeFlowTemplate = undefined;
 
+  var regexToTestPath = /\{.+\}/;
+  var regexToDeleteNamedURIPart = /\{.+:\s\(/g;
+  var regexToDeleteClosingCurlyBracket = /\}/g;
+  var regexToDeleteNamedURIWithSquareBracket = /\{.+:\s\[/g;
+
   grunt.registerTask('exportApigeeProxies',
   'Creates Apigee conditional flows from a valid source.',
   function () {
@@ -64,6 +69,7 @@ module.exports = function (grunt) {
     grunt.log.writeln('it has ' + path.operations.length + ' operations');
     async.map(path.operations, function interator(op, callback) {
       if (!op.path) op.path = path.path;
+      op.path = parseURI(op.path);
       return callback(null, Mustache.render(apigeeFlowTemplate, op));
     }, function (err, result) {
       if (err) return callback(err);
@@ -97,5 +103,18 @@ module.exports = function (grunt) {
     var fileName = path.replace(/\//, ''); // replace the first slach by empty string
     fileName = fileName.replace(/\//g, '-'); // replace the intermadiate slasheh by a dash
     return fileName;
+  }
+
+  function parseURI(uri) {
+    uri = uri.replace(/\//g, '\\/');
+    if (!regexToTestPath.test(uri)) {
+      return uri;
+    }
+
+    uri = uri.replace(regexToDeleteNamedURIPart, '(');
+    uri = uri.replace(regexToDeleteClosingCurlyBracket, '');
+    uri = uri.replace(regexToDeleteNamedURIWithSquareBracket, '[');
+
+    return uri;
   }
 };
